@@ -1,0 +1,1 @@
+python collection.py <> <>

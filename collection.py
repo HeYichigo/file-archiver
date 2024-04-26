@@ -1,7 +1,6 @@
 import os
 import operator
 from datetime import datetime
-from time import sleep
 from zipfile import ZipFile
 from os import path
 from concurrent.futures import ProcessPoolExecutor, Future
