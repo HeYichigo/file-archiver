@@ -16,6 +16,7 @@ logging.basicConfig(
 
 root_path: str = os.sys.argv[1]
 target_path: str = os.sys.argv[2]
+limit: int = int(os.sys.argv[3])
 executor = ProcessPoolExecutor()
 d = datetime.now()
 current_date = datetime(year=d.year, month=d.month, day=1)
@@ -62,7 +63,7 @@ def group_file_list(file_list: list[tuple[str, datetime]]):
     ## 最后一个月份的不会被处理
     while idx < len(file_list):
         _, date = file_list[idx]
-        if s_date != date or (idx - s_idx) > 1000:
+        if s_date != date or (idx - s_idx) > limit:
             s_date = date
             fut = executor.submit(zip_file_list, file_list, s_idx, idx)
             future_set.append(fut)
