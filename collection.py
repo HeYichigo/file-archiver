@@ -78,7 +78,8 @@ def group_file_list(file_list: list[tuple[str, datetime]]):
 # 处理文件 [s_idx, e_idx)
 def zip_file_list(file_list: list[tuple[str, datetime]], s_idx: int, e_idx: int):
     _, zip_name = file_list[s_idx]
-    zip_name = f"{zip_name.isoformat()}_{current_process().name}"
+    zip_name = f"{zip_name.year}-{zip_name.month}-archive"
+    zip_name = f"{zip_name}_{current_process().name}"
     zip_path = path.join(target_path, zip_name)
     with ZipFile(zip_path, "x") as zip:
         logger.info(f"create zip: {zip_path}")
