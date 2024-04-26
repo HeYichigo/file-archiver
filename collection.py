@@ -16,7 +16,9 @@ logging.basicConfig(
 
 root_path: str = os.sys.argv[1]
 target_path: str = os.sys.argv[2]
-executor = ProcessPoolExecutor()
+executor = ProcessPoolExecutor(8)
+d = datetime.now()
+current_date = datetime(year=d.year, month=d.month, day=1)
 
 future_set: list[Future] = []
 
@@ -38,7 +40,8 @@ def get_file_list(dir_path: str):
         if len(filenames) > 0:
             for file_name in filenames:
                 file_path = path.join(dirpath, file_name)
-                file_time = datetime.fromtimestamp(path.getctime(file_path))
+                ctime = path.getmtime(file_path)
+                file_time = datetime.fromtimestamp(ctime)
                 year, month = file_time.year, file_time.month
                 # 只取得每个文件月份的部分
                 file_month_time = datetime(year, month, 1)
@@ -66,10 +69,15 @@ def group_file_list(file_list: list[tuple[str, datetime]]):
             s_idx = idx
         idx = idx + 1
 
+    ## 检查最后一个月份，如果不是当月就处理
+    if s_date != current_date:
+        fut = executor.submit(zip_file_list, file_list, s_idx, idx)
+        future_set.append(fut)
+
 
 # 处理文件 [s_idx, e_idx)
 def zip_file_list(file_list: list[tuple[str, datetime]], s_idx: int, e_idx: int):
-    _, zip_name = file_list[0]
+    _, zip_name = file_list[s_idx]
     zip_name = f"{zip_name}_{current_process().name}"
     zip_path = path.join(target_path, zip_name)
     with ZipFile(zip_path, "x") as zip:
@@ -97,14 +105,14 @@ if __name__ == "__main__":
     dir_list = get_root_dir_list(root_path)
     for dir_path in dir_list:
         logger.info(f"handle files at path: {dir_path}")
-        fut = executor.submit(task, dir_path)
-        future_set.append(fut)
+        file_list = get_file_list(dir_path)
+        group_file_list(file_list)
 
     while 1:
+        sleep(2)
         copy = future_set.copy()
         for fut in copy:
             if fut.done():
                 future_set.remove(fut)
-        sleep(2)
         if len(future_set) == 0:
             break
