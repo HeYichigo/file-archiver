@@ -80,7 +80,7 @@ def group_file_list(file_list: list[tuple[str, datetime]]):
 def zip_file_list(file_list: list[tuple[str, datetime]], s_idx: int, e_idx: int):
     _, zip_name = file_list[s_idx]
     zip_name = f"{zip_name.year}-{zip_name.month}-archive"
-    zip_name = f"{zip_name}_{uuid.uuid5(uuid.NAMESPACE_OID,'zip-file')}"
+    zip_name = f"{zip_name}_{uuid.uuid4()}"
     zip_path = path.join(target_path, zip_name)
     with ZipFile(zip_path, "x") as zip:
         logger.info(f"create zip: {zip_path}")
