@@ -89,7 +89,7 @@ def zip_file_list(file_list: list[tuple[str, datetime]], s_idx: int, e_idx: int)
             # 添加删除操作
             os.remove(file_path)
             i = (idx - s_idx) * 100 / (e_idx - s_idx)
-            logger.info(f"{zip_name[0:20]}: {i:2.1d}% : {'▋'*int(i/2):50s}")
+            logger.info(f"{zip_name[0:20]}: {i:2.1f}% : {'▋'*int(i/2):50s}")
     logger.info(f"already done {zip_name} at {zip_path}")
     return
 
