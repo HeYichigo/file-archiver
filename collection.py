@@ -109,9 +109,9 @@ if __name__ == "__main__":
         group_file_list(file_list)
 
     while 1:
-        sleep(2)
         copy = future_set.copy()
         for fut in copy:
+            fut.result()
             if fut.done():
                 future_set.remove(fut)
         if len(future_set) == 0:
