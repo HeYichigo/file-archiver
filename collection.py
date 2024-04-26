@@ -86,11 +86,11 @@ def zip_file_list(file_list: list[tuple[str, datetime]], s_idx: int, e_idx: int)
         logger.info(f"create zip: {zip_path}")
         for idx in range(s_idx, e_idx):
             file_path, _ = file_list[idx]
-            logger.info(f"zip    file: {file_path}")
             zip.write(file_path)
             # 添加删除操作
-            logger.info(f"remove file: {file_path}")
             os.remove(file_path)
+            i = (idx-s_idx)/(e_idx-s_idx)
+            logger.info(f"{zip_name[0:10]}: {i*100}% : {"▋"*int(i)//2}")
     logger.info(f"already done {zip_name} at {zip_path}")
     return
 
