@@ -6,6 +6,7 @@ from os import path
 from concurrent.futures import ProcessPoolExecutor, Future
 from multiprocessing import current_process
 import logging
+import uuid
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -61,7 +62,7 @@ def group_file_list(file_list: list[tuple[str, datetime]]):
     ## 最后一个月份的不会被处理
     while idx < len(file_list):
         _, date = file_list[idx]
-        if s_date != date:
+        if s_date != date or (idx - s_idx) > 1000:
             s_date = date
             fut = executor.submit(zip_file_list, file_list, s_idx, idx)
             future_set.append(fut)
@@ -78,7 +79,7 @@ def group_file_list(file_list: list[tuple[str, datetime]]):
 def zip_file_list(file_list: list[tuple[str, datetime]], s_idx: int, e_idx: int):
     _, zip_name = file_list[s_idx]
     zip_name = f"{zip_name.year}-{zip_name.month}-archive"
-    zip_name = f"{zip_name}_{current_process().name}"
+    zip_name = f"{zip_name}_{uuid.uuid5(uuid.NAMESPACE_OID,'zip-file')}"
     zip_path = path.join(target_path, zip_name)
     with ZipFile(zip_path, "x") as zip:
         logger.info(f"create zip: {zip_path}")
