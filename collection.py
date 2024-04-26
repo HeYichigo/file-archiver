@@ -16,7 +16,7 @@ logging.basicConfig(
 
 root_path: str = os.sys.argv[1]
 target_path: str = os.sys.argv[2]
-executor = ProcessPoolExecutor(8)
+executor = ProcessPoolExecutor()
 d = datetime.now()
 current_date = datetime(year=d.year, month=d.month, day=1)
 
