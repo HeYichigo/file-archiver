@@ -1,6 +1,6 @@
 chcp 65001
 @echo off
 
-python collection.py <> <> >> exec.log
+python collection.py <> <> 200 >> exec.log
 
 pause
