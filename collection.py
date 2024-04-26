@@ -10,7 +10,7 @@ import uuid
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s %(process)-6d %(processName)-8s %(levelname)s %(message)s",
+    format="%(asctime)s %(process)-6d %(processName)-20s %(levelname)s %(message)s",
 )
 
 root_path: str = os.sys.argv[1]
