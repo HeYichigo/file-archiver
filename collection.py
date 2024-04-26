@@ -82,15 +82,15 @@ def zip_file_list(file_list: list[tuple[str, datetime]], s_idx: int, e_idx: int)
     zip_name = f"{zip_name.year}-{zip_name.month}-archive"
     zip_name = f"{zip_name}_{uuid.uuid4()}"
     zip_path = path.join(target_path, zip_name)
+    ## 创建压缩包
     with ZipFile(zip_path, "x") as zip:
-        logger.info(f"create zip: {zip_path}")
         for idx in range(s_idx, e_idx):
             file_path, _ = file_list[idx]
             zip.write(file_path)
             # 添加删除操作
             os.remove(file_path)
             i = int((idx - s_idx) * 100 / (e_idx - s_idx))
-            logger.info(f"{zip_name[0:10]}: {i}% : {'▋'*(i/4)}")
+            logger.info(f"{zip_name[0:20]}: {i}% : {'▋'*int(i/4)}")
     logger.info(f"already done {zip_name} at {zip_path}")
     return
 
