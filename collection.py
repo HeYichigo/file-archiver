@@ -6,6 +6,7 @@ from os import path
 from concurrent.futures import ProcessPoolExecutor, Future
 import logging
 import uuid
+import shutil
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -64,15 +65,33 @@ def group_file_list(file_list: list[tuple[str, datetime]]):
         _, date = file_list[idx]
         if s_date != date or (idx - s_idx) > limit:
             s_date = date
-            fut = executor.submit(zip_file_list, file_list, s_idx, idx)
+            fut = executor.submit(handle_file_list, file_list, s_idx, idx)
             future_set.append(fut)
             s_idx = idx
         idx = idx + 1
 
     ## 检查最后一个月份，如果不是当月就处理
     if s_date != current_date:
-        fut = executor.submit(zip_file_list, file_list, s_idx, idx)
+        fut = executor.submit(handle_file_list, file_list, s_idx, idx)
         future_set.append(fut)
+
+
+# 处理文件 [s_idx, e_idx)
+def handle_file_list(file_list: list[tuple[str, datetime]], s_idx: int, e_idx: int):
+    _, arch_name = file_list[s_idx]
+    arch_name = f"{arch_name.year}-{arch_name.month:0>2}-archive"
+    arch_path = path.join(target_path, arch_name)
+    # 尝试创建文件夹
+    try:
+        os.mkdir(arch_path)
+    except FileExistsError:
+        pass
+    # 将文件移动至该目录
+    for idx in range(s_idx, e_idx):
+        file_path, _ = file_list[idx]
+        shutil.move(file_path, arch_path)
+        i = (idx - s_idx) * 100 / (e_idx - s_idx)
+        logger.info(f"{arch_name[0:20]}: {i:2.1f}% : {'▋'*int(i/2):50s}")
 
 
 # 处理文件 [s_idx, e_idx)
