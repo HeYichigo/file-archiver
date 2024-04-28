@@ -60,12 +60,17 @@ def group_file_list(file_list: list[tuple[str, datetime]]):
     s_idx = 0
     idx = 0
     s_date = file_list[0][1]
+    batch_num = 0
     ## 最后一个月份的不会被处理
     while idx < len(file_list):
         _, date = file_list[idx]
         if s_date != date or (idx - s_idx) > limit:
+            if s_date != date:
+                batch_num = 0
+            elif (idx - s_idx) > limit:
+                batch_num += 1
             s_date = date
-            fut = executor.submit(handle_file_list, file_list, s_idx, idx)
+            fut = executor.submit(handle_file_list, file_list, s_idx, idx, batch_num)
             future_set.append(fut)
             s_idx = idx
         idx = idx + 1
@@ -77,7 +82,9 @@ def group_file_list(file_list: list[tuple[str, datetime]]):
 
 
 # 处理文件 [s_idx, e_idx)
-def handle_file_list(file_list: list[tuple[str, datetime]], s_idx: int, e_idx: int):
+def handle_file_list(
+    file_list: list[tuple[str, datetime]], s_idx: int, e_idx: int, batch_num: int
+):
     _, arch_name = file_list[s_idx]
     arch_name = f"{arch_name.year}-{arch_name.month:0>2}-archive"
     arch_path = path.join(target_path, arch_name)
@@ -91,7 +98,7 @@ def handle_file_list(file_list: list[tuple[str, datetime]], s_idx: int, e_idx: i
         file_path, _ = file_list[idx]
         shutil.move(file_path, arch_path)
         i = (idx - s_idx) * 100 / (e_idx - s_idx)
-        logger.info(f"{arch_name[0:20]}: {i:2.1f}% : {'▋'*int(i/2):50s}")
+        logger.info(f"{arch_name} batch={batch_num}: {i:2.1f}% : {'▋'*int(i/2):50s}")
 
 
 # 处理文件 [s_idx, e_idx)
